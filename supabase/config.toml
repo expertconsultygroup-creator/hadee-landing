@@ -1,0 +1,5 @@
+[api]
+enabled = false
+
+[functions.send-waitlist-email]
+verify_jwt = false
