@@ -39,7 +39,7 @@ export function WaitlistForm({ language }: WaitlistFormProps) {
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, language }),
       });
 
       const data = await res.json();

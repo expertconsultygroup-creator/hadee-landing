@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
+import { getWaitlistEmailHtml } from "@/lib/email-template";
+import { Resend } from "resend";
 
 function generateReferralCode(): string {
   return Math.random().toString(36).substring(2, 8);
@@ -7,7 +9,7 @@ function generateReferralCode(): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json();
+    const { email, language = "ar" } = await request.json();
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json(
@@ -15,6 +17,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const supabase = getSupabase();
 
     // Check if email already exists
     const { data: existing } = await supabase
@@ -38,7 +42,7 @@ export async function POST(request: NextRequest) {
     const position = (count || 0) + 848;
     const referralCode = generateReferralCode();
 
-    // Get referrer from request
+    // Get referrer from URL
     const refParam = request.nextUrl.searchParams.get("ref");
 
     // Insert new signup
@@ -51,7 +55,6 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       if (error.code === "23505") {
-        // Unique constraint violation - race condition, email was just inserted
         const { data: justInserted } = await supabase
           .from("waitlist")
           .select("position, referral_code")
@@ -64,6 +67,32 @@ export async function POST(request: NextRequest) {
         });
       }
       throw error;
+    }
+
+    // Send confirmation email
+    if (process.env.RESEND_API_KEY) {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const baseUrl = process.env.NEXT_PUBLIC_URL || "https://hadee.sa";
+      const lang = language === "en" ? "en" : "ar";
+
+      try {
+        await resend.emails.send({
+          from: process.env.RESEND_FROM_EMAIL || "Hadi <onboarding@resend.dev>",
+          to: email,
+          subject:
+            lang === "ar"
+              ? `أهلًا بك في هادي — أنت رقم #${position}`
+              : `Welcome to Hadi — You're #${position}`,
+          html: getWaitlistEmailHtml({
+            position,
+            referralCode,
+            language: lang,
+            baseUrl,
+          }),
+        });
+      } catch (emailError) {
+        console.error("Email send failed:", emailError);
+      }
     }
 
     return NextResponse.json({ position, referralCode });
