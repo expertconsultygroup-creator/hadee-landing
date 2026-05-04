@@ -66,7 +66,7 @@ export function ChatShowcase({ language }: ChatShowcaseProps) {
                     </svg>
                     <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
                       <Image
-                        src="/logo.png"
+                        src="/logo.jpg"
                         alt="Hadi"
                         width={20}
                         height={20}

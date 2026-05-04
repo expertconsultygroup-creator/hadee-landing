@@ -18,7 +18,7 @@ export function Footer({ language }: FooterProps) {
           <div className="text-center md:text-start">
             <div className="flex items-center gap-3 justify-center md:justify-start mb-3">
               <Image
-                src="/logo.png"
+                src="/logo.jpg"
                 alt="Hadi"
                 width={32}
                 height={32}

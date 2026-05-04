@@ -37,7 +37,7 @@ export function Header({ language, onToggle }: HeaderProps) {
           {/* Logo */}
           <div className="flex items-center gap-3">
             <Image
-              src="/logo.png"
+              src="/logo.jpg"
               alt="Hadi"
               width={36}
               height={36}
