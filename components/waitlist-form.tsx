@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Check } from "lucide-react";
 import { Language, translations } from "@/lib/translations";
 import { cn } from "@/lib/utils";
 
@@ -19,9 +20,7 @@ export function WaitlistForm({ language }: WaitlistFormProps) {
 
   const t = translations[language];
 
-  const validateEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -44,9 +43,7 @@ export function WaitlistForm({ language }: WaitlistFormProps) {
 
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.error || t.serverError);
-      }
+      if (!res.ok) throw new Error(data.error || t.serverError);
 
       setPosition(data.position);
       setReferralCode(data.referralCode);
@@ -81,43 +78,29 @@ export function WaitlistForm({ language }: WaitlistFormProps) {
     <div className="w-full">
       <AnimatePresence mode="wait">
         {status === "success" ? (
-          <motion.div
-            key="success"
-            {...motionProps}
-            className="text-center space-y-3"
-          >
+          <motion.div key="success" {...motionProps} className="text-center space-y-3">
             <p className="text-primary font-medium text-lg flex items-center justify-center gap-2">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-primary">
-                <path d="M16.667 5L7.5 14.167 3.333 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <Check className="w-5 h-5" />
               {t.successTitle}
             </p>
             <p className="text-text-primary font-medium">
               {t.successNumber(position)}
             </p>
-            <p className="text-text-muted text-sm">
-              {t.successMessage}
-            </p>
+            <p className="text-text-muted text-sm">{t.successMessage}</p>
             <button
               onClick={handleShare}
               className={cn(
-                "mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-2xl",
+                "mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-full",
                 "text-sm font-medium text-primary",
-                "bg-primary-soft hover:bg-primary/20",
+                "bg-primary-soft hover:bg-primary-tint",
                 "transition-colors duration-200",
                 "focus-ring"
               )}
             >
               {copied ? t.copied : t.share}
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                fill="none"
-                className={cn("rtl:rotate-180", copied && "hidden")}
-              >
-                <path d="M1 7h12m0 0L8 2m5 5L8 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              {!copied && (
+                <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
+              )}
             </button>
           </motion.div>
         ) : (
@@ -130,11 +113,11 @@ export function WaitlistForm({ language }: WaitlistFormProps) {
           >
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1 relative">
-                <label htmlFor="email" className="sr-only">
+                <label htmlFor="waitlist-email" className="sr-only">
                   {t.placeholder}
                 </label>
                 <input
-                  id="email"
+                  id="waitlist-email"
                   type="email"
                   value={email}
                   onChange={(e) => {
@@ -144,13 +127,13 @@ export function WaitlistForm({ language }: WaitlistFormProps) {
                   placeholder={t.placeholder}
                   dir={language === "ar" ? "rtl" : "ltr"}
                   className={cn(
-                    "w-full px-5 py-3.5 rounded-2xl",
+                    "w-full px-5 py-3.5 rounded-xl",
                     "bg-white border border-border",
                     "text-text-primary placeholder:text-text-muted",
                     "transition-all duration-200",
                     "hover:border-primary/30",
                     "focus-ring",
-                    status === "error" && "border-red-300"
+                    status === "error" && "border-error/40"
                   )}
                   required
                   autoComplete="email"
@@ -160,10 +143,10 @@ export function WaitlistForm({ language }: WaitlistFormProps) {
                 type="submit"
                 disabled={status === "loading"}
                 className={cn(
-                  "px-6 py-3.5 rounded-2xl",
+                  "px-6 py-3.5 rounded-xl",
                   "bg-primary text-white font-medium",
                   "transition-all duration-200",
-                  "hover:bg-primary-deep hover:shadow-sm",
+                  "hover:bg-primary-deep hover:scale-[1.02]",
                   "disabled:opacity-60 disabled:cursor-not-allowed",
                   "focus-ring",
                   "whitespace-nowrap flex items-center justify-center gap-2",
@@ -172,27 +155,19 @@ export function WaitlistForm({ language }: WaitlistFormProps) {
               >
                 {status === "loading" ? (
                   <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
                 ) : (
                   <>
                     {t.cta}
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      className="rtl:rotate-180"
-                    >
-                      <path d="M1 7h12m0 0L8 2m5 5L8 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                    <ArrowRight className="w-4 h-4 rtl:rotate-180" />
                   </>
                 )}
               </button>
             </div>
             {status === "error" && errorMessage && (
-              <p className="mt-2 text-sm text-red-500 px-1" role="alert">
+              <p className="mt-2 text-sm text-error px-1" role="alert">
                 {errorMessage}
               </p>
             )}
